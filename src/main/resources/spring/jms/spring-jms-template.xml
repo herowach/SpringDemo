@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+     http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.2.xsd">
+	
+	<!-- general JMS steps -->
+	<!-- 
+		ConnectionFactory->Connection->Session->MessageProducer->send
+		1. get JNDI
+		2. get ConnectionFactory
+		3. get Connection from ConnectionFactory
+		4. get Session from Connection
+		5. with Session, create MessageProducer, MessageConsumer and Message
+		6. MessageProducer send Message to Destination
+		7. MessageConsumer receive Message from Destination with MessageListenerContainer
+	 -->
+    
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="defaultDestination" ref="queue1"/><!-- if no destination specified, will send to the default -->
+    </bean>
+    
+    <bean id="jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="topicConnectionFactory"/>
+        <property name="defaultDestination" ref="topic1"/>
+        <property name="pubSubDomain" value="true"/><!-- true means this for topic only -->
+    </bean>
+    
+    <bean id="customMessageConverter" class="com.spring.test.jms.CustomMessageConverter"/>
+    
+    <!-- <bean id="jmsTemplateWithConverter" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="topicConnectionFactory"/>
+        <property name="messageConverter" ref="customMessageConverter"/>
+    </bean> -->
+    
+    <!-- Sender1 -->
+    <bean id="msgSender" class="com.spring.test.jms.MsgSender">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+    </bean>
+    
+    <!-- Sender2 -->
+    <bean id="msgSender2" class="com.spring.test.jms.MsgSender">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="queue" ref="queue2"/>
+    </bean>
+    
+    <!-- Sender3 -->
+    <bean id="msgSender3" class="com.spring.test.jms.MsgSender">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="queue" ref="queue3"/>
+    </bean>
+    
+    <!-- Sender4 -->
+    <bean id="msgSender4" class="com.spring.test.jms.MsgSender">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="queue" ref="queue4"/>
+    </bean>
+    
+     <!-- Sender5 -->
+    <bean id="msgSender5" class="com.spring.test.jms.MsgSender">
+        <property name="jmsTemplate" ref="jmsTopicTemplate"/>
+        <property name="topic" ref="topic1"/>
+    </bean>
+    
+    <!-- Receiver1 -->
+    <bean id="msgReceiver" class="com.spring.test.jms.MsgReceiver"/>
+    <!-- Receiver2 -->
+    <bean id="springReceiver" class="com.spring.test.jms.SpringMsgReceiver"/>
+    <!-- Receiver3 -->
+    <bean id="msgDelegate" class="com.spring.test.jms.MessageDelegate"/>
+    <bean id="messageAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+	    <constructor-arg>
+	        <ref bean="msgDelegate"/>
+	    </constructor-arg>
+	    <property name="defaultListenerMethod" value="handleMessage" />
+	</bean>
+    <!-- Receiver4 -->
+    <bean id="pojoMsgReceiver" class="com.spring.test.jms.PojoMsgReceiver"/>
+    
+    <!-- Queue is point to point, therefore the message will be sent to only one consumer even if 
+    	there are more than one message listener for the same queue -->
+    <bean id="msgListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer" >
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="queue1"/>
+        <property name="messageListener" ref="msgReceiver"/>
+        <property name="concurrentConsumers" value="5"/>
+        <property name="maxConcurrentConsumers" value="20"/>
+        <!-- <property name="messageSelector" value="AccountID=1234"/> --><!-- message filter -->
+        <!-- <property name="transactionManager" ref="jmsTransactionManager"/> -->
+    </bean>
+    
+    <bean id="jndiDestinationResolver" class="org.springframework.jms.support.destination.JndiDestinationResolver"/>
+    
+    <!-- the default jndi resolver is DynamicDestinationResolver, which only accepts a bean(queue);
+    	 so have to specifiy a JndiDestinationResolver to parse jndi name for jms:listener -->
+	<jms:listener-container connection-factory="connectionFactory" 
+							destination-resolver="jndiDestinationResolver"
+							concurrency="5">
+	    <jms:listener destination="/queue/Queue2" ref="springReceiver"/>
+	    <jms:listener destination="/queue/Queue3" ref="messageAdapter" selector="JMSCorrelationID='123-00001'"/>
+	    <jms:listener destination="/queue/Queue4" ref="pojoMsgReceiver" method="textMessageHandler"/><!-- method is required for POJO -->
+	    
+	    <!-- special queue -->
+	    <!-- <jms:listener destination="/queue/DLQ" ref="msgReceiver"/>
+	    <jms:listener destination="/queue/ExpiryQueue" ref="msgReceiver"/> -->
+	</jms:listener-container>
+    
+    <!-- Topic listener -->
+    <!-- concurrency: should be limited to 1 for topic on listener container -->
+    <!-- destination-type: should be topic -->
+	<jms:listener-container connection-factory="topicConnectionFactory" 
+							destination-resolver="jndiDestinationResolver"
+							destination-type="topic">
+		<jms:listener destination="/jms/Topic1" ref="msgReceiver"/>
+		<jms:listener destination="/jms/Topic1" ref="springReceiver"/>
+		<jms:listener destination="/jms/Topic1" ref="messageAdapter"/>
+	</jms:listener-container>
+	
+						
+	<!-- <bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+  		<property name="connectionFactory" ref="connectionFactory"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="jmsTransactionManager"/> -->
+	
+</beans>

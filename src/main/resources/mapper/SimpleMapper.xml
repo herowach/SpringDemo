@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.SimpleMapper">
+	
+	<resultMap id="reportDTO" type="ReportDTO">
+		<id property="rptId" column="REPORT_ID"/>
+		<result property="rptName" column="REPORT_NAME"/>
+		<result property="createdBy" column="CREATED_BY"/>
+		<result property="dateStr" column="CREATION_TIME"/>
+	</resultMap>
+	
+	<select id="getTest" resultMap="reportDTO" parameterType="map" useCache="false"> 	
+    	select * from TEST1 	
+	</select>
+	
+	<select id="getTestWithParam" resultMap="reportDTO" parameterType="map" useCache="false"> 	
+    	select * from TEST1 where created_by=#{createdBy} order by to_number(report_id) asc
+	</select>
+	
+	<select id="selectOne" resultType="String" parameterType="String" useCache="false"> 	
+    	select REPORT_NAME from TEST1 where REPORT_ID=#{value}	
+	</select>
+	
+	<insert id="insertTest" parameterType="map">
+		<selectKey keyProperty="rptId" resultType="java.lang.String" order="BEFORE">
+		    WITH T as ( SELECT max(to_number(report_id)) as id FROM TEST1 )
+			SELECT to_char(decode(T.id, null, 1, T.id + 1)) as rptId from T
+		</selectKey>
+		<![CDATA[
+			INSERT INTO TEST1(REPORT_ID, REPORT_NAME, CREATED_BY, CREATION_TIME) 
+				values(#{rptId}, #{rptName}, #{createdBy}, TO_DATE(#{dateStr},'yyyy-MM-dd'))
+		]]>
+	</insert>
+	
+	<update id="updateTest" parameterType="map">
+		UPDATE TEST1
+		<set>
+			<if test="rptName != null">REPORT_NAME = #{rptName},</if>
+			<if test="createdBy != null">CREATED_BY = #{createdBy},</if>
+			<if test="creationTime != null">CREATION_TIME = TO_DATE(#{dateStr},'yyyy-MM-dd hh:mm:ss')</if>
+		</set>
+		WHERE REPORT_ID=#{rptId}	
+	</update>
+</mapper>

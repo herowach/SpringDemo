@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+	xmlns:jee="http://www.springframework.org/schema/jee" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd 
+       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd">
+
+	<!-- memory DB -->
+	<!-- <jdbc:embedded-database id="hsqlDataSource" type="HSQL">
+        <jdbc:script location="classpath:./spring/datasource/db/schema.sql" separator="/;"/>
+        <jdbc:script location="classpath:./spring/datasource/db/data.sql"/>
+    </jdbc:embedded-database> -->
+
+	<context:property-placeholder location="classpath:env/${app.env:local}/jdbc.properties,classpath:env/${app.env:local}/jndi.properties" />
+
+	<!-- jdbc datasource -->
+   	<!-- BoneCP: lazyInit property specified as true b/s we use jdbcDataSource as fallback solution -->
+    <bean id="boneCPDataSource"
+          class="com.jolbox.bonecp.BoneCPDataSource"
+          destroy-method="close"
+          lazy-init="true">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="minConnectionsPerPartition" value="3"/>
+        <property name="maxConnectionsPerPartition" value="5"/>
+        <property name="idleConnectionTestPeriodInMinutes" value="2"/>
+    </bean>
+    
+    <!-- DBCP -->
+    <!-- <bean id="dbcpDataSource" 
+    	  class="org.apache.commons.dbcp.BasicDataSource" 
+    	  destroy-method="close">
+    	<property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.jdbcUrl}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean> -->
+    
+    <!-- c3p0 -->
+	<!-- <bean id="c3p0DataSource" 
+    	  class="org.mchange.v2.c3p0.ComboPooledDataSource" 
+    	  destroy-method="close">
+    	<property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="use" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean> -->
+	
+	<!-- plain datasource(Spring) usage: springDataSource.getConnection() -->
+	<!-- <bean id="springDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.jdbcUrl}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+	</bean> -->
+	
+	<!-- instantiate datasouce only when needed -->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+        <property name="targetDataSource" ref="boneCPDataSource"/>
+    </bean>
+</beans>

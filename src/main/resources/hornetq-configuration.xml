@@ -1,0 +1,42 @@
+<configuration xmlns="urn:hornetq"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="urn:hornetq /schema/hornetq-jms.xsd">
+
+    <connectors>
+        <connector name="netty-connector">
+            <factory-class>org.hornetq.core.remoting.impl.netty.NettyConnectorFactory</factory-class>
+        </connector>
+    </connectors>
+    <!--  Acceptors -->
+    <acceptors>
+        <acceptor name="netty-acceptor">
+            <factory-class>org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory</factory-class>
+        </acceptor>
+    </acceptors>
+
+
+    <security-settings>
+        <security-setting match="#">
+            <permission roles="guest" type="createDurableQueue"></permission>
+            <permission roles="guest" type="deleteDurableQueue"></permission>
+            <permission roles="guest" type="createTempQueue"></permission>
+            <permission roles="guest" type="deleteTempQueue"></permission>
+            <permission roles="guest" type="send"></permission>
+            <permission roles="guest" type="consume"></permission>
+            <permission roles="guest" type="manage"></permission>
+        </security-setting>
+    </security-settings>
+
+    <address-settings>
+        <address-setting match="#">
+        	<send-to-dla-on-no-route>true</send-to-dla-on-no-route>
+            <dead-letter-address>jms.queue.DLQ</dead-letter-address>
+            <max-delivery-attempts>3</max-delivery-attempts>
+            <expiry-address>jms.queue.ExpiryQueue</expiry-address>
+            <redelivery-delay>0</redelivery-delay>
+            <max-size-bytes>-1</max-size-bytes>
+            <page-size-bytes>10485760</page-size-bytes>
+            <message-counter-history-day-limit>10</message-counter-history-day-limit>
+        </address-setting>
+    </address-settings>
+</configuration>

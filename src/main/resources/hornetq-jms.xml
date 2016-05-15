@@ -1,0 +1,66 @@
+<configuration xmlns="urn:hornetq"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="urn:hornetq /schema/hornetq-jms.xsd">
+    <connection-factory name="ConnectionFactory">
+        <connectors>
+            <connector-ref connector-name="netty-connector"></connector-ref>
+        </connectors>
+        <entries>
+        	<entry name="ConnectionFactory"/>
+        	<entry name="TopicConnectionFactory"/>
+        </entries>
+        
+        <retry-interval>1000</retry-interval>
+        <retry-interval-multiplier>1.5</retry-interval-multiplier>
+        <max-retry-interval>60000</max-retry-interval>
+        <reconnect-attempts>1000</reconnect-attempts>
+        <confirmation-window-size>1048576</confirmation-window-size>
+    </connection-factory>
+
+    <queue name="Queue1">
+        <entry name="/queue/Queue1"/>
+    </queue>
+	<queue name="Queue2">
+        <entry name="/queue/Queue2"></entry>
+    </queue>
+    <queue name="Queue3">
+        <entry name="/queue/Queue3"></entry>
+    </queue>
+    <queue name="Queue4">
+        <entry name="/queue/Queue4"></entry>
+    </queue>
+
+    <queue name="DLQ">
+        <entry name="/queue/DLQ"></entry>
+    </queue>
+    <queue name="ExpiryQueue">
+        <entry name="/queue/ExpiryQueue"></entry>
+    </queue>
+    
+    <!-- <connection-factory name="TopicConnectionFactory">
+        <connectors>
+            <connector-ref connector-name="netty-connector"></connector-ref>
+        </connectors>
+        <entries>
+        	<entry name="ConnectionFactory"/>
+        </entries>
+        <retry-interval>1000</retry-interval>
+        <retry-interval-multiplier>1.5</retry-interval-multiplier>
+        <max-retry-interval>60000</max-retry-interval>
+        <reconnect-attempts>1000</reconnect-attempts>
+        <confirmation-window-size>1048576</confirmation-window-size>
+    </connection-factory> -->
+    
+    <topic name="topic1">
+        <entry name="/jms/Topic1"></entry>
+    </topic>
+
+    <topic name="topic2">
+        <entry name="/jms/Topic2"></entry>
+    </topic>
+
+	<topic name="topic3">
+        <entry name="/jms/Topic3"></entry>
+    </topic>
+
+</configuration>

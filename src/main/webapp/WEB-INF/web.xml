@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>SpringDemo</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	
+	<!-- spring configuration path -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:spring/spring-config.xml</param-value>
+		<!-- <param-value>classpath*:spring/spring-config-test.xml</param-value> -->
+	</context-param>
+	
+	<!-- Quartz configuration -->
+	<!-- <context-param>
+		<param-name>quartz:config-file</param-name>
+		<param-value>classpath*:properties/quartz.properties</param-value>
+	</context-param>-->
+	
+	<!-- whether call schedule.start() when the quartz listener is loaded(server startup). default: true -->
+	<context-param>
+		<param-name>quartz:start-on-load</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	
+	<!-- whether call schedule.shutdown() when the quartz listener is unloaded(server shutdown). default: true -->
+	<context-param>
+		<param-name>quartz:shutdown-on-unload</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<!-- end Quartz configuration -->
+	
+	<!-- must be the first listener to avoid the memory leaking issue which caused by Struts/Quartz etc when shutting down the web container  -->
+	<listener>  
+        <listener-class>  
+            org.springframework.web.util.IntrospectorCleanupListener  
+        </listener-class>  
+    </listener>  
+	
+	<!-- start the spring container up -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- provides request/session scope on a bean -->
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+
+	<!-- quartz listener used for loading configuration, bind job's lifecycle with web container's lifecycle,
+		 means will automactially monitor the jobs once the web server started
+	 -->
+	<!-- <listener>
+         <listener-class>org.quartz.ee.servlet.QuartzInitializerListener</listener-class>
+    </listener> -->
+    
+    <!-- to resolve the character encoding problem -->
+    <filter>  
+	    <filter-name>CharacterEncodingFilter</filter-name>  
+	    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>  
+	    <init-param>  
+	        <param-name>encoding</param-name>  
+	        <param-value>utf-8</param-value>  
+	    </init-param>  
+	</filter>  
+	<filter-mapping>  
+	    <filter-name>CharacterEncodingFilter</filter-name>  
+	    <url-pattern>/*</url-pattern>  
+	</filter-mapping> 
+
+	<!-- <servlet>
+		<servlet-name>spring-web</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+            <param-name>contextClass</param-name>
+            <param-value>
+                org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+            </param-value>
+        </init-param>
+		<init-param>
+			<param-name>dispatchOptionsRequest</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>spring-web</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping> -->
+	
+	<!-- CXF Servlet -->
+    <servlet>
+        <servlet-name>CXFService</servlet-name>
+        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CXFService</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+    <!-- End CXF Servlet -->
+	
+	<!-- <resource-ref id="queue3">
+	    <res-ref-name>queue3</res-ref-name>
+	    <res-type>javax.jms.Queue</res-type>
+	    <res-auth>Container</res-auth>
+	    <lookup-name>/queue/Queue3</lookup-name>
+	</resource-ref> -->
+	
+	
+	<!-- for web service -->
+	<!-- <servlet>
+	    <servlet-name>accountExporter</servlet-name>
+	    <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>accountExporter</servlet-name>
+	    <url-pattern>/remoting/AccountService</url-pattern>
+	</servlet-mapping> -->
+</web-app>

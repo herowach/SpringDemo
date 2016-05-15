@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context override="true" useNaming="false">
+	<Resource name="jdbc/test1" auth="Container"
+			type="javax.sql.DataSource" factory="org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory"
+			username="" password="" driverClassName="oracle.jdbc.OracleDriver"
+			url="jdbc:oracle:thin:@host:1523:xxx" maxWait="1000"
+			removeAbandoned="true" maxActive="30" maxIdle="10"
+			removeAbandonedTimeout="60" logAbandoned="true" />
+			
+	<Resource name="jdbc/test2" auth="Container"
+			type="javax.sql.DataSource" factory="org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory"
+			username="" password="" driverClassName="oracle.jdbc.OracleDriver"
+			url="jdbc:oracle:thin:@host:1523:xxx" maxWait="1000"
+			removeAbandoned="true" maxActive="30" maxIdle="10"
+			removeAbandonedTimeout="60" logAbandoned="true" />
+ </Context>

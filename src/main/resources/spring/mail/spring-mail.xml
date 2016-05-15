@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+     http://www.springframework.org/schema/context  
+     http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	
+	<context:property-placeholder location="classpath:properties/mail.properties" />
+	
+	<bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage">
+  		<property name="from" value="${mail.from}"/>
+  		<property name="to" value="${mail.to}"/>
+  		<property name="subject" value="${mail.subject}"/>
+  		<property name="text" value="${mail.content.text}"/>
+	</bean>
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+  		<property name="host" value="${mail.host}"/>
+  		<property name="port" value="${mail.port}"/>
+  		<property name="username" value="${mail.username}"/>
+  		<property name="password" value="${mail.password}"/>
+	</bean>
+</beans>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+	
+	<bean name="namingServerImpl"
+          class="org.jnp.server.NamingBeanImpl"
+          init-method="start"
+          destroy-method="stop">
+    </bean>
+
+    <bean name="namingServer" class="org.jnp.server.Main" init-method="start" destroy-method="stop">
+        <property name="namingInfo" ref="namingServerImpl"></property>
+        <property name="port" value="1099"/>
+        <property name="bindAddress" value="localhost"/>
+        <property name="rmiPort" value="1098"/>
+        <property name="rmiBindAddress" value="localhost"/>
+        <property name="useGlobalService" value="true"/>
+     </bean>
+
+    <bean class="java.lang.management.ManagementFactory"
+          factory-method="getPlatformMBeanServer"
+          name="mbeanServer">
+    </bean>
+    
+    <bean class="org.hornetq.spi.core.security.HornetQSecurityManagerImpl"
+          name="hornetQSecurityManagerImpl">
+    </bean>
+	
+	<bean class="org.hornetq.core.config.impl.FileConfiguration"
+          init-method="start"
+          destroy-method="stop"
+          name="fileConfiguration">
+    </bean>
+
+    <bean name="hornetQServerImpl" class="org.hornetq.core.server.impl.HornetQServerImpl" depends-on="namingServer">
+        <constructor-arg ref="fileConfiguration"/>
+        <constructor-arg ref="mbeanServer"/>
+        <constructor-arg ref="hornetQSecurityManagerImpl"/>
+    </bean>
+
+    <bean name="jmsServerManagerImpl"
+          class="org.hornetq.jms.server.impl.JMSServerManagerImpl"
+          init-method="start"
+          destroy-method="stop">
+        <constructor-arg ref="hornetQServerImpl"/>
+    </bean>
+</beans>

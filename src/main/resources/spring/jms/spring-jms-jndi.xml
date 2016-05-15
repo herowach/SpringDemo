@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+     http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd">
+	
+	<!-- will bind classpath:jndi.properties, same as the below bean definition -->
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate"/>
+	
+	<!-- <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+	    <property name="environment">
+	        <props>
+	            <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
+	            <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
+	            <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop>
+	        </props>
+	    </property>
+	</bean> -->
+
+    <bean id="baseConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean" depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="ConnectionFactory"/>
+    </bean>
+    
+    <!-- <jee:jndi-lookup id="baseConnectionFactory" 
+    				 jndi-name="java:/ConnectionFactory"
+    				 lazy-init="true" 
+    				 proxy-interface="javax.jms.ConnectionFactory"/> -->
+    
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+    	<property name="targetConnectionFactory" ref="baseConnectionFactory"/>
+    	<property name="sessionCacheSize" value="10"/>
+    </bean>
+    
+    <bean id="topicConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean" depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="TopicConnectionFactory"/>
+    </bean>
+
+    <bean id="queue1"
+          class="org.springframework.jndi.JndiObjectFactoryBean"
+          depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="/queue/Queue1"/>
+    </bean>
+    
+    <bean id="queue2"
+          class="org.springframework.jndi.JndiObjectFactoryBean"
+          depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="/queue/Queue2"/>
+    </bean>
+    
+    <bean id="queue3" 
+          class="org.springframework.jndi.JndiObjectFactoryBean"
+          depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="/queue/Queue3"/>
+    </bean>
+    
+    <bean id="queue4" 
+          class="org.springframework.jndi.JndiObjectFactoryBean"
+          depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="/queue/Queue4"/>
+    </bean>
+    
+    <bean id="topic1"
+          class="org.springframework.jndi.JndiObjectFactoryBean"
+          depends-on="jmsServerManagerImpl">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="/jms/Topic1"/>
+    </bean>
+    
+    <!-- <jee:jndi-lookup id="queue1" jndi-name="/queue/Queue1"/> -->
+	
+</beans>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+     xmlns:context="http://www.springframework.org/schema/context"
+     xmlns:jaxws="http://cxf.apache.org/jaxws" 
+     xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+     http://www.springframework.org/schema/context 
+     http://www.springframework.org/schema/context/spring-context-3.2.xsd
+     http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+     
+	<!-- <bean id="accountService" class="com.spring.test.ws.AccountServiceImpl">
+	</bean>
+     
+    <bean name="/AccountService" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+	    <property name="service" ref="accountService"/>
+	    <property name="serviceInterface" value="com.spring.test.ws.AccountService"/>
+	</bean>
+	
+	<bean id="httpInvokerProxy" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+	    <property name="serviceUrl" value="http://localhost:8080/remoting/AccountService"/>
+	    <property name="serviceInterface" value="com.spring.test.AccountService"/>
+	</bean> -->
+	
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	
+	<context:component-scan base-package="com.spring.test.ws"/>
+	
+	<!-- only the relative path is allowed for the address if you are not using jetty -->
+	<jaxws:server id="accountServiceServer" serviceBean="#accountService" address="/AccountService">
+        <jaxws:inInterceptors>
+        	<bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="UsernameToken"/>
+                        <!-- PasswordText means no encryption on the password(plain text) -->
+                        <entry key="passwordType" value="PasswordText"/>
+                        <entry key="passwordCallbackRef">
+                            <!-- call back handler class -->
+                            <ref bean="serverPasswordCallback"/>
+                        </entry>
+                    </map>
+                </constructor-arg>
+            </bean>
+	        <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+	        <bean class="com.spring.test.ws.AuthValidateInterceptor" />
+	    </jaxws:inInterceptors>
+	    <jaxws:outInterceptors>
+	        <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+	    </jaxws:outInterceptors>
+	    
+	    <jaxws:properties>  
+        <!-- enable MTOM(SOAP Message Transmission Optimization Mechanism) to allow the file(DataHandler) type -->
+        	<entry key="mtom_enabled" value="true"/>
+        </jaxws:properties>  
+    </jaxws:server>
+
+	<!-- endpoint VS server -->
+	<!-- 
+		endpoint comes from JAX-WS API
+		server comes from CXF API
+		they are almost same in CXF, because the EndpointImpl is a wrapper class for the JaxWsServerFactoryBean
+	 -->
+</beans>

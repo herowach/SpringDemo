@@ -12,7 +12,7 @@
 			<level>INFO</level><!-- only log INFO/WARN/ERROR -->
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${app.logs.root}/Sprint_Test_LogFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${app.logs.root}/SprintDemo_Log.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>7</maxHistory><!-- keep at most 7 log files(7days, a week) -->
 		</rollingPolicy>
 

@@ -8,30 +8,21 @@ public class UserInfo  implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	public UserInfo() {
-		super();
-	}
-	
-	public UserInfo(String name, String pwd) {
-		this.username = name;
-		this.password = pwd;
-	}
-	
-	public UserInfo(String name, String pwd, int age, String gender, String email, Date createDate) {
-		this.username = name;
-		this.password = pwd;
-		this.age = age;
-		this.gender = gender;
-		this.email = email;
-		this.createDate = createDate;
-	}
-	
+	private int id;
 	private String username;
 	private String password;
 	private int age;
 	private String gender;
 	private String email;
 	private Date createDate;
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public int getAge() {
 		return age;
@@ -80,6 +71,25 @@ public class UserInfo  implements Serializable{
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
+	
+	public UserInfo() {
+		super();
+	}
+	
+	public UserInfo(String name, String pwd) {
+		this.username = name;
+		this.password = pwd;
+	}
+	
+	public UserInfo(int id, String name, String pwd, int age, String gender, String email, Date createDate) {
+		this.id = id;
+		this.username = name;
+		this.password = pwd;
+		this.age = age;
+		this.gender = gender;
+		this.email = email;
+		this.createDate = createDate;
+	}
 
 	public boolean equals(UserInfo user) {
 		if (null == user) {
@@ -91,17 +101,6 @@ public class UserInfo  implements Serializable{
 			return true;
 		}
 		return false;
-	}
-	
-	public static UserInfo getRandomUser() {
-		UserInfo user = new UserInfo();
-		/*user.setUsername("sfrtgsdfsdf");
-		user.setPassword("uioijhkjhhk");
-		user.setAge(30);
-		user.setGender("hgjghjfg");
-		user.setPhone("rthfg");
-		user.setAddress("fdgdftujhty");*/
-		return user;
 	}
 	
 	@Override

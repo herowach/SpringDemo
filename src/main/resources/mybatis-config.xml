@@ -5,12 +5,12 @@
 <configuration>
     <settings>
         <setting name="lazyLoadingEnabled" value="false"/>
-        <setting name="cacheEnabled" value="false"/>  
+        <setting name="cacheEnabled" value="false"/>
     	<!-- <setting name="jdbcTypeForNull" value="VARCHAR"/> -->
     </settings>
     
     <!-- Global type alias -->
     <typeAliases>
-    	<typeAlias alias="ReportDTO" type="com.spring.dto.ReportDTO"/>
+    	<typeAlias alias="Employee" type="com.demo.model.Employee"/>
     </typeAliases>
 </configuration>

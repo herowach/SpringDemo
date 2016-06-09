@@ -11,12 +11,17 @@
      http://www.springframework.org/schema/context  
      http://www.springframework.org/schema/context/spring-context-3.2.xsd">
      
-	<context:component-scan base-package="com.spring.test.*;"/>
-	
-	<tx:annotation-driven transaction-manager="transactionManager" />
-	
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
+	<!-- 
+		enable @Transactional注解，属性有：
+		transaction-manager： 指定执行事务的transactionManager的bean，只有一个transactionManager时可以不指定
+		mode： 可用的值有proxy(默认)和aspectj，前者用JDK的代理，后者用AspectJ
+		proxy-target-class： 如果为true，Spring将创建子类来代理业务类（需要在类路径中添加CGLib.jar类库）；如果为false，则使用基于接口的代理。
+		order: 如果业务类除事务切面外，还需要织入其他的切面，通过该属性可以控制事务切面在目标连接点的织入顺序
+	 -->
+	<tx:annotation-driven />
 	
 </beans>

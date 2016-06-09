@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.spring.orm.EmployeeDAO">
+	
+	<!-- 已经在全局配置中配置过别名 -->
+	<resultMap id="employeeMap" type="employee">
+		<id property="id" column="EMPLOYEE_ID"/>
+		<!-- <result property="department" typeHandler=""/> -->
+	</resultMap>
+	
+	<select id="getEmployeeList" parameterType="map" resultMap="employeeMap"> 	
+    	SELECT 
+    		EMPLOYEE_ID, 
+    		EMP.NAME, 
+    		CODE, 
+    		SALARY, 
+    		CREATE_DATE as createDate, 
+    		DPT.DEPARTMENT_ID, 
+    		DPT.NAME as dptName 
+    	FROM 
+    		EMPLOYEE AS EMP, DEPARTMENT AS DPT 
+    	<where>
+    		EMP.DEPARTMENT_ID=DPT.DEPARTMENT_ID 
+    		<if test="id != null and id != ''"> EMP.EMPLOYEE_ID=#{id}</if>
+    	</where>
+	</select>
+	
+	<insert id="addEmployee" parameterType="employee">
+		INSERT INTO EMPLOYEE(NAME, CODE, SALARY, DEPARTMENT_ID) VALUES(#{name}, #{code}, #{salary}, #{department.id});
+	</insert>
+	
+	
+	<insert id="joinClub" parameterType="map">
+		INSERT INTO MEMBERSHIP(EMPLOYEE_ID, CLUB_ID) VALUES(#{employeeId}, #{clubId});
+	</insert>
+	
+	
+	<!-- <insert id="addClub" parameterType="com.demo.model.Club">
+		INSERT INTO CLUB(NAME, DESCRIPTION, FEE) VALUES(#{name}, #{desc}, #{fee});
+	</insert>
+	
+	<update id="updateClub">
+		UPDATE CLUB  
+		<set>
+			<if test="name != null and name != ''">NAME = #{name},</if>
+			<if test="desc != null and desc != ''">DESCRIPTION = #{desc},</if>
+			<if test="fee != null">FEE = #{fee}</if>
+		</set>
+		WHERE CLUB_ID=#{id}
+	</update>
+	
+	<delete id="deleteClub" parameterType="int">
+		DELETE FROM CLUB WHERE CLUB_ID=#{value}
+	</delete>
+	
+	<delete id="deleteMembershipByClubId" parameterType="int">
+		DELETE FROM MEMBERSHIP WHERE CLUB_ID=#{value}
+	</delete> -->
+	
+</mapper>

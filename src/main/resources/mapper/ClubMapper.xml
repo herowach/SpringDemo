@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace: DAO接口全类名 -->
+<mapper namespace="com.demo.spring.orm.ClubDAO">
+	
+	<!-- 
+		每个cache的id就是namespace的值
+		type: cache类别， 默认为PERPETUAL， 可以指定其它cache实现类的完整类名
+		eviction： 回收算法， 
+			LRU(默认): 最近最少使用的：移除最长时间不被使用的对象
+			FIFO: 先进先出, 按对象进入缓存的顺序来移除它们
+			SOFT: 软引用, 移除基于垃圾回收器状态和软引用规则的对象
+		flushInterval： 刷新间隔，默认为1个小时，单位毫秒
+		size： 缓存大小，默认大小1024字节，单位为引用数
+		readOnly：只读
+	 -->
+	<cache type="PERPETUAL" eviction="LRU" flushInterval="60000" size="512" readOnly="true"/>
+	
+	<!-- 根据namespace引用别的cache -->
+	<!-- <cache-ref namespace="com.someone.application.data.SomeMapper"/> -->
+	
+	<!-- 如果type已经在config中定义过别名，则type可以使用别名 -->
+	<resultMap id="club" type="com.demo.model.Club">
+		<id property="id" column="CLUB_ID"/>
+		<result property="desc" column="DESCRIPTION"/>
+	</resultMap>
+	
+	<!-- 能重复使用的静态语句 -->
+	<sql id="clubCols"> NAME, DESCRIPTION, FEE</sql>
+	<!-- 
+		parameterType: 传入参数类型， 内置类型有int,map， 其它为类的完整类名，例如com.demo.model.Club/java.util.ArrayList等
+		flushCache: 执行完毕后清空本地缓存，默认false
+		useCache: 是否缓存本条语句的结果， 默认true, 可以在全局设置里设为false
+	 -->
+	<select id="getClubList" parameterType="map" resultMap="club" useCache="true"> 	
+    	SELECT CLUB_ID,<include refid="clubCols"/> FROM CLUB 
+    	<where>
+    		<if test="id != null and id != ''"> CLUB_ID=#{id}</if>
+    		<if test="name != null and name != ''"> AND NAME like CONCAT('%',#{name},'%')</if>
+    	</where>
+	</select>
+	
+	<!-- 
+		useGeneratedKeys: 告诉MyBatis使用JDBC的getGeneratedKeys方法来取出由数据,默认false
+	 -->
+	<insert id="addClub" parameterType="com.demo.model.Club">
+		INSERT INTO CLUB(NAME, DESCRIPTION, FEE) VALUES(#{name}, #{desc}, #{fee});
+	</insert>
+	
+	<update id="updateClub">
+		UPDATE CLUB  
+		<set>
+			<if test="name != null and name != ''">NAME = #{name},</if>
+			<if test="desc != null and desc != ''">DESCRIPTION = #{desc},</if>
+			<if test="fee != null">FEE = #{fee}</if>
+		</set>
+		WHERE CLUB_ID=#{id}
+	</update>
+	
+	<!-- 如果参数不是对象，参数名可以是任何名字 -->
+	<delete id="deleteClub" parameterType="int">
+		DELETE FROM CLUB WHERE CLUB_ID=#{value}
+	</delete>
+	
+	<delete id="deleteMembershipByClubId" parameterType="int">
+		DELETE FROM MEMBERSHIP WHERE CLUB_ID=#{value}
+	</delete>
+	
+</mapper>

@@ -9,11 +9,10 @@ import javax.annotation.Resource;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.stereotype.Repository;
 
 import com.demo.model.dto.ReportDTO;
 
-@Repository("mybatisDAO")
+//@Repository("mybatisDAO")
 public class MyBatisDAO {
 	
 	@Resource

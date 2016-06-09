@@ -9,7 +9,7 @@
        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd 
        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd">
 
-	<context:property-placeholder location="classpath:env/${app.env:local}/jdbc.properties,classpath:env/${app.env:local}/jndi.properties" />
+	<context:property-placeholder location="classpath:env/${app.env:local}/jndi.properties" />
 
 	<!-- JNDI -->
 	<bean id="jndiDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">

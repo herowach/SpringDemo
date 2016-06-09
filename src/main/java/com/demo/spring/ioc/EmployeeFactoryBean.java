@@ -23,7 +23,7 @@ public class EmployeeFactoryBean implements FactoryBean<Employee> {
 		//do some convert and handler on the result
 		if(employee == null) {
 			employee = new Employee();
-			employee.setId("-1");
+			employee.setId(-1);
 			employee.setName("unknown");
 			employee.setCode("-99");
 			employee.setSalary(new BigDecimal(0));
